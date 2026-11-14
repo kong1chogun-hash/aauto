@@ -16,6 +16,7 @@ function Main.Start(context)
 
     -- These modules expose their interfaces but remain inactive until implemented.
     context.Runtime = {
+        AutoFarm = modules.AutoFarm and modules.AutoFarm.Init(modules.Config.AutoFarm, context),
         Macro = modules.Macro and modules.Macro.Init(modules.Config.Macro),
         Discord = modules.Discord and modules.Discord.Init(modules.Config.Discord),
     }
