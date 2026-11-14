@@ -6,6 +6,13 @@ return {
         Theme = "Dark",
         Accent = "Violet",
     },
+    AutoFarm = {
+        Enabled = false,
+        Mode = "Story",
+        Stage = "",
+        Repeat = false,
+        MaxRuns = 1,
+    },
     Macro = {
         Enabled = false,
         Mode = "Manual",
