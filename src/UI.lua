@@ -238,7 +238,95 @@ local function showPage(name)
         addInfoCard(content, "Project status", "UI foundation is online. Game automation modules are not connected in this build yet.", 148)
         addInfoCard(content, "Supported game", "Anime Adventures only. No other game modules are loaded.", 242)
     elseif name == "Auto Farm" then
-        addInfoCard(content, "Auto Farm", "Module not implemented yet. This page is reserved for Anime Adventures farming controls.", 54)
+        addInfoCard(content, "Auto Farm controls", "Choose a mode and stage. Start remains locked until a verified screen-input adapter is connected.", 54)
+
+        local runtime = context.Runtime and context.Runtime.AutoFarm
+        local selectedMode = (runtime and runtime.GetConfig and runtime.GetConfig().Mode) or "Story"
+        local modes = {"Story", "Infinite", "Event / Portal", "Legend Stages"}
+        local modeIndex = 1
+        for i, mode in ipairs(modes) do if mode == selectedMode then modeIndex = i end end
+
+        local modeButton = create("TextButton", {
+            Name = "FarmMode",
+            Text = "Mode: " .. selectedMode .. "  (click to change)",
+            TextSize = 13,
+            Font = Enum.Font.GothamMedium,
+            TextColor3 = THEME.text,
+            BackgroundColor3 = THEME.panel2,
+            BorderSizePixel = 0,
+            Position = UDim2.fromOffset(14, 150),
+            Size = UDim2.new(1, -28, 0, 38),
+            AutoButtonColor = true,
+        }, content)
+        round(modeButton, 8)
+        stroke(modeButton, THEME.border)
+        modeButton.MouseButton1Click:Connect(function()
+            modeIndex = (modeIndex % #modes) + 1
+            selectedMode = modes[modeIndex]
+            modeButton.Text = "Mode: " .. selectedMode .. "  (click to change)"
+            if runtime and runtime.SetMode then runtime.SetMode(selectedMode) end
+        end)
+
+        local stageBox = create("TextBox", {
+            Name = "FarmStage",
+            Text = (runtime and runtime.GetConfig and runtime.GetConfig().Stage) or "",
+            PlaceholderText = "Enter stage name (exactly as shown in game)",
+            TextSize = 13,
+            Font = Enum.Font.Gotham,
+            TextColor3 = THEME.text,
+            PlaceholderColor3 = THEME.muted,
+            BackgroundColor3 = THEME.panel2,
+            BorderSizePixel = 0,
+            ClearTextOnFocus = false,
+            Position = UDim2.fromOffset(14, 198),
+            Size = UDim2.new(1, -28, 0, 38),
+        }, content)
+        round(stageBox, 8)
+        stroke(stageBox, THEME.border)
+        stageBox.FocusLost:Connect(function()
+            if runtime and runtime.SetStage then runtime.SetStage(stageBox.Text) end
+        end)
+
+        local statusLabel = label(content, "Status: " .. ((runtime and runtime.GetStatus and runtime.GetStatus()) or "Not initialized"), 12, THEME.muted)
+        statusLabel.Position = UDim2.fromOffset(16, 246)
+        statusLabel.Size = UDim2.new(1, -32, 0, 26)
+
+        local startButton = create("TextButton", {
+            Name = "StartFarm",
+            Text = "START",
+            TextSize = 13,
+            Font = Enum.Font.GothamBold,
+            TextColor3 = THEME.text,
+            BackgroundColor3 = THEME.accentDark,
+            BorderSizePixel = 0,
+            Position = UDim2.fromOffset(14, 282),
+            Size = UDim2.new(0.5, -20, 0, 38),
+        }, content)
+        round(startButton, 8)
+        startButton.MouseButton1Click:Connect(function()
+            if runtime and runtime.Start then runtime.Start() end
+            statusLabel.Text = "Status: " .. ((runtime and runtime.GetStatus and runtime.GetStatus()) or "Unavailable")
+        end)
+
+        local stopButton = create("TextButton", {
+            Name = "StopFarm",
+            Text = "STOP",
+            TextSize = 13,
+            Font = Enum.Font.GothamBold,
+            TextColor3 = THEME.text,
+            BackgroundColor3 = THEME.panel2,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0.5, 6, 0, 282),
+            Size = UDim2.new(0.5, -20, 0, 38),
+        }, content)
+        round(stopButton, 8)
+        stroke(stopButton, THEME.border)
+        stopButton.MouseButton1Click:Connect(function()
+            if runtime and runtime.Stop then runtime.Stop() end
+            statusLabel.Text = "Status: " .. ((runtime and runtime.GetStatus and runtime.GetStatus()) or "Stopped")
+        end)
+
+        addInfoCard(content, "Input adapter", "No executor-specific click/key API has been assumed. Connect and verify an input adapter before enabling real automation.", 332)
     elseif name == "Unit Manager" then
         addInfoCard(content, "Unit Manager", "Module not implemented yet. Unit selection and placement controls will be added here.", 54)
     elseif name == "Macro" then
