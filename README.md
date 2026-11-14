@@ -1,34 +1,33 @@
 # aaauto
 
-Anime Adventures-only project.
+Anime Adventures-only project with a single-entry, modular, keyless loader.
 
-## Quick test
-
-Run this in the supported Luau executor environment:
+## Run
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/kong1chogun-hash/aauto/main/Loader.lua"))()
 ```
 
+## Module loading
+
+`Loader.lua` downloads the modules in a fixed order and passes them to `Main.Start(context)`.
+
+- `src/Config.lua` — shared defaults
+- `src/Functions.lua` — logging and safe-call helpers
+- `src/UI.lua` — initial dark interface shell
+- `src/Macro.lua` — macro interface placeholder
+- `src/Discord.lua` — opt-in reporter interface placeholder
+- `src/main.lua` — application entry point
+
 ## Current status
 
-- [x] Keyless bootstrap (no key prompt or key validation)
-- [x] Initial dark UI shell with violet accent
-- [x] Dashboard and navigation pages
-- [x] Close button and draggable window
-- [ ] Anime Adventures gameplay modules
+- [x] One-line, keyless loader
+- [x] Modular download and initialization
+- [x] Existing dashboard/navigation UI retained as a module
+- [ ] Anime Adventures gameplay automation
 - [ ] Unit manager
 - [ ] Macro recording and playback
-- [ ] Discord end-of-run reporter and rare-drop alerts
+- [ ] Discord end-of-run reports and rare-drop alerts
 - [ ] Settings and profile persistence
 
-The current build is an interface foundation, not a completed farming script. The unfinished pages are clearly marked and do not claim to automate gameplay.
-
-## Project layout
-
-- `Loader.lua` — downloads and starts the project entry point.
-- `src/main.lua` — keyless UI shell.
-
-## Notes
-
-The loader executes the current contents of this repository's `main` branch. Review changes before running updates.
+The unfinished modules are interfaces only. This build does not automate gameplay, send Discord messages, or record/play macros. The loader executes Lua source fetched from this repository's `main` branch; review repository changes before running it.
