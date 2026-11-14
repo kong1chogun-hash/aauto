@@ -1,35 +1,42 @@
--- aaauto Loader
--- Keyless bootstrap for the aaauto client.
--- This loader downloads only the project entry point from this repository.
+-- aaauto | Modular Keyless Loader
+-- Single entry point. Modules are loaded in a fixed, explicit order.
+local BASE_URL = "https://raw.githubusercontent.com/kong1chogun-hash/aauto/main/"
+local MODULE_PATHS = {
+    Config = "src/Config.lua",
+    Functions = "src/Functions.lua",
+    UI = "src/UI.lua",
+    Macro = "src/Macro.lua",
+    Discord = "src/Discord.lua",
+    Main = "src/main.lua",
+}
 
-local SOURCE_URL = "https://raw.githubusercontent.com/kong1chogun-hash/aauto/main/src/main.lua"
-
-local function fetchSource()
+local function loadModule(name, path)
     local ok, source = pcall(function()
-        return game:HttpGet(SOURCE_URL)
+        return game:HttpGet(BASE_URL .. path)
     end)
+    assert(ok, "[aaauto] Download failed (" .. name .. "): " .. tostring(source))
+    assert(type(source) == "string" and #source > 0, "[aaauto] Empty module: " .. name)
 
-    if not ok then
-        error("[aaauto] Failed to download client: " .. tostring(source), 0)
-    end
+    local chunk, compileError = loadstring(source, "@aaauto/" .. path)
+    assert(type(chunk) == "function", "[aaauto] Compile failed (" .. name .. "): " .. tostring(compileError))
 
-    if type(source) ~= "string" or #source == 0 then
-        error("[aaauto] Downloaded client is empty.", 0)
-    end
-
-    return source
+    local ran, result = pcall(chunk)
+    assert(ran, "[aaauto] Module initialization failed (" .. name .. "): " .. tostring(result))
+    return result
 end
 
-local source = fetchSource()
-local compile, compileError = loadstring(source, "@aaauto/src/main.lua")
+local context = {
+    Version = "0.2.0",
+    Modules = {},
+}
 
-if not compile then
-    error("[aaauto] Lua compile error: " .. tostring(compileError), 0)
+for name, path in pairs(MODULE_PATHS) do
+    context.Modules[name] = loadModule(name, path)
 end
 
-local ok, result = pcall(compile)
-if not ok then
-    error("[aaauto] Startup error: " .. tostring(result), 0)
-end
+assert(type(context.Modules.Main) == "table" and type(context.Modules.Main.Start) == "function",
+    "[aaauto] Main module must return a table with Start(context)")
 
+local started, result = pcall(context.Modules.Main.Start, context)
+assert(started, "[aaauto] Startup failed: " .. tostring(result))
 return result
