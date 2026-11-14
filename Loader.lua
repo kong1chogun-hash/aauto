@@ -6,6 +6,7 @@ local MODULE_PATHS = {
     Functions = "src/Functions.lua",
     UI = "src/UI.lua",
     Macro = "src/Macro.lua",
+    AutoFarm = "src/AutoFarm.lua",
     Discord = "src/Discord.lua",
     Main = "src/main.lua",
 }
@@ -30,8 +31,9 @@ local context = {
     Modules = {},
 }
 
-for name, path in pairs(MODULE_PATHS) do
-    context.Modules[name] = loadModule(name, path)
+local LOAD_ORDER = {"Config", "Functions", "UI", "AutoFarm", "Macro", "Discord", "Main"}
+for _, name in ipairs(LOAD_ORDER) do
+    context.Modules[name] = loadModule(name, MODULE_PATHS[name])
 end
 
 assert(type(context.Modules.Main) == "table" and type(context.Modules.Main.Start) == "function",
