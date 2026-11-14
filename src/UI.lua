@@ -109,14 +109,56 @@ local subtitle = label(topbar, "ANIME ADVENTURES", 10, THEME.muted, Enum.Font.Go
 subtitle.Position = UDim2.fromOffset(102, 2)
 subtitle.Size = UDim2.new(0, 180, 1, 0)
 
+-- Minimize control: hide the full window without destroying the UI.
+local minimize = create("TextButton", {
+    Name = "Minimize",
+    Text = "–",
+    TextSize = 25,
+    Font = Enum.Font.Gotham,
+    TextColor3 = THEME.muted,
+    BackgroundTransparency = 1,
+    Size = UDim2.fromOffset(38, 42),
+    Position = UDim2.new(1, -82, 0, 3),
+    AutoButtonColor = false,
+}, topbar)
+
+-- Small floating launcher used to restore the full window.
+local miniButton = create("TextButton", {
+    Name = "aaautoRestore",
+    Text = "aa",
+    TextSize = 14,
+    Font = Enum.Font.GothamBold,
+    TextColor3 = THEME.text,
+    BackgroundColor3 = THEME.accentDark,
+    BorderSizePixel = 0,
+    Size = UDim2.fromOffset(48, 42),
+    Position = UDim2.new(1, -62, 0.5, -21),
+    Visible = false,
+    AutoButtonColor = true,
+    ZIndex = 20,
+}, screen)
+round(miniButton, 12)
+stroke(miniButton, THEME.accent)
+
+minimize.MouseButton1Click:Connect(function()
+    window.Visible = false
+    miniButton.Visible = true
+end)
+
+miniButton.MouseButton1Click:Connect(function()
+    window.Visible = true
+    miniButton.Visible = false
+end)
+
 local close = create("TextButton", {
     Text = "×",
     TextSize = 25,
     Font = Enum.Font.Gotham,
     TextColor3 = THEME.muted,
     BackgroundTransparency = 1,
-    Size = UDim2.fromOffset(42, 42),
-    Position = UDim2.new(1, -46, 0, 3),
+    Size = UDim2.fromOffset(38, 42),
+    Position = UDim2.new(1, -42, 0, 3),
+    AutoButtonColor = false,
 }, topbar)
 close.MouseButton1Click:Connect(function()
     screen:Destroy()
